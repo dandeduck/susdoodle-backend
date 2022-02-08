@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { ActivityWord } from './models/activityWord.entity';
 import { AnimalWord } from './models/animalWord.entity';
 import { FamousPeopleWord } from './models/famousPeopleWord.entity';
 import { FoodWord } from './models/foodWord.entity';
 import { MovieWord } from './models/movieWord.entity';
+import { Word } from './models/word.entity';
 
 @Injectable()
 export class WordsService {
+  private MAX_WORD_AMOUNT = 25;
+
   private categoryRepositories = new Map<string, Repository<any>>();
+  private categoryEntities = new Map<string, typeof Word>();
 
   constructor(
     @InjectRepository(ActivityWord)
@@ -28,9 +32,37 @@ export class WordsService {
     this.categoryRepositories.set('person', famousPeopleWordRepository);
     this.categoryRepositories.set('food', foodWordRepository);
     this.categoryRepositories.set('movie', movieWordRepository);
+
+    this.categoryEntities.set('activity', ActivityWord);
+    this.categoryEntities.set('animal', AnimalWord);
+    this.categoryEntities.set('person', FamousPeopleWord);
+    this.categoryEntities.set('food', FoodWord);
+    this.categoryEntities.set('movie', MovieWord);
   }
 
   addWord(word: string, category: string) {
     return this.categoryRepositories.get(category).save({word: word});
+  }
+
+  async getWordsFromAll(amount: number, categories: string[]) {
+    amount = Math.min(amount, this.MAX_WORD_AMOUNT);
+
+    let words = await Promise.all(categories.map(category => this.getWords(category, Math.ceil(amount/categories.length))));
+    let flattenedWords = [].concat.apply([], words);
+
+    flattenedWords = flattenedWords.sort((a, b) => 0.5 - Math.random());
+
+    return flattenedWords.slice(0, amount);
+  }
+
+  getWords(category: string, amount: number) {
+    amount = Math.min(amount, this.MAX_WORD_AMOUNT);
+
+    return this.categoryRepositories.get(category).createQueryBuilder()
+      .select(category+".word")
+      .from(this.categoryEntities.get(category), category)
+      .orderBy("RANDOM()")
+      .limit(amount)
+      .getMany();
   }
 }
