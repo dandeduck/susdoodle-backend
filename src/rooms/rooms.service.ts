@@ -14,15 +14,19 @@ export class RoomsService {
     
   }
 
-  removePlayer(roomNumber: number, player: Player) {
-    if (this.rooms.has(roomNumber))
+  removePlayer(player: Player, roomNumber?: number, id?: string) {
+    if (id)
+      roomNumber = this.roomIds.get(id);
+
+    if (roomNumber && this.rooms.has(roomNumber))
       this.removePlayerFromRoom(this.rooms.get(roomNumber), player);
     else
       throw new HttpException("Room by this number doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
   private removePlayerFromRoom(room: Room, player: Player) {
-    const index = room.players.indexOf(player);
+    const foundPlayer = room.players.filter(p => p.id === player.id)[0];
+    const index = room.players.indexOf(foundPlayer);
       if (index > -1) {
         room.players.splice(index, 1);
       }
@@ -43,12 +47,20 @@ export class RoomsService {
       return room;
     }
     else
-      throw new HttpException("Room by this number doesn't exist", HttpStatus.BAD_REQUEST);
+      throw new HttpException("Room by this number/id doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
-  closeRoom(roomNumber: number) {
-    this.roomIds.delete(this.rooms.get(roomNumber).id);
-    this.rooms.delete(roomNumber);
+  closeRoom(roomNumber?: number, id?: string) {
+    if (id)
+      roomNumber = this.roomIds.get(id);
+    
+    if (roomNumber) {
+      this.roomIds.delete(this.rooms.get(roomNumber).id);
+      this.rooms.delete(roomNumber);
+    }
+
+    else
+      throw new HttpException("Room by this number/id doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
   createNewRoom(creator: Player, config: RoomConfiguration) {

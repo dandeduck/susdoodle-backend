@@ -8,6 +8,12 @@ import { RoomsService } from './rooms.service';
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService, private readonly wordsService: WordsService){}
 
+  @Post('leave')
+  @UseGuards(AuthGuard('api-key'))
+  leaveRoom(@Body('player') player: Player, @Body('id') id?: string, @Body('number') roomNumber?: number) {
+    this.roomsService.removePlayer(player, roomNumber, id);
+  }
+
   @Post('join')
   @UseGuards(AuthGuard('api-key'))
   joinRoom(@Body('player') player: Player, @Body('id') id?: string, @Body('number') roomNumber?: number) {
