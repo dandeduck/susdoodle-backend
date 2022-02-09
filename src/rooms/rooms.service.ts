@@ -8,6 +8,11 @@ import { RoomConfiguration } from './roomConfiguration.model';
 export class RoomsService {
   private MAX_ROOM_COUNT = 1000;
   private rooms = new Map<number, Room>();
+  private roomIds = new Map<string, number>();
+
+  getOpenRooms() {
+    
+  }
 
   removePlayer(roomNumber: number, player: Player) {
     if (this.rooms.has(roomNumber))
@@ -20,17 +25,29 @@ export class RoomsService {
     const index = room.players.indexOf(player);
       if (index > -1) {
         room.players.splice(index, 1);
-}
+      }
   }
 
-  addPlayer(roomNumber: number, player: Player) {
-    if (this.rooms.has(roomNumber))
-      this.rooms.get(roomNumber).players.push(player);
+  addPlayer(player: Player, id?: string, roomNumber?: number) {
+    if (id)
+      roomNumber = this.roomIds.get(id);
+
+    if (roomNumber && this.rooms.has(roomNumber)) {
+      const room = this.rooms.get(roomNumber);
+
+      if (room.config.size <= room.players.length)
+        throw new HttpException("The room is full", HttpStatus.FORBIDDEN);
+
+      room.players.push(player);
+
+      return room;
+    }
     else
       throw new HttpException("Room by this number doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
   closeRoom(roomNumber: number) {
+    this.roomIds.delete(this.rooms.get(roomNumber).id);
     this.rooms.delete(roomNumber);
   }
 
@@ -46,12 +63,13 @@ export class RoomsService {
     };
 
     this.rooms.set(room.roomNumber, room);
+    this.roomIds.set(room.id, room.roomNumber);
 
     return room;
   }
 
   private generateNewRoomNumber() {
-    let roomNumber;
+    let roomNumber = 0;
 
     do {
       roomNumber = Math.floor(100000 + Math.random() * 900000);
