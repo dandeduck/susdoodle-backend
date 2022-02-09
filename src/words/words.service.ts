@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ActivityWord } from './models/activityWord.entity';
 import { AnimalWord } from './models/animalWord.entity';
 import { FamousPeopleWord } from './models/famousPeopleWord.entity';
@@ -41,10 +41,13 @@ export class WordsService {
   }
 
   addWord(word: string, category: string) {
+    if (!this.categoryRepositories.has(category))
+      throw new HttpException(`Specified category ${category} does not exist`, HttpStatus.BAD_REQUEST);
+
     return this.categoryRepositories.get(category).save({word: word});
   }
 
-  async getWordsFromAll(amount: number, categories: string[]) {
+  async getWordsFromAll(amount: number, categories: string[]): Promise<Word[]> {
     amount = Math.min(amount, this.MAX_WORD_AMOUNT);
 
     let words = await Promise.all(categories.map(category => this.getWords(category, Math.ceil(amount/categories.length))));
@@ -56,6 +59,9 @@ export class WordsService {
   }
 
   getWords(category: string, amount: number) {
+    if (!this.categoryEntities.has(category))
+      throw new HttpException(`Specified category ${category} does not exist`, HttpStatus.BAD_REQUEST);
+
     amount = Math.min(amount, this.MAX_WORD_AMOUNT);
 
     return this.categoryRepositories.get(category).createQueryBuilder()

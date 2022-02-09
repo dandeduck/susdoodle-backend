@@ -13,6 +13,7 @@ import { MovieWord } from './models/movieWord.entity';
     TypeOrmModule.forFeature([ActivityWord, AnimalWord, FamousPeopleWord, FoodWord, MovieWord])
   ],
   providers: [WordsService],
-  controllers: [WordsController]
+  controllers: [WordsController],
+  exports: [WordsService]
 })
 export class WordsModule {}
