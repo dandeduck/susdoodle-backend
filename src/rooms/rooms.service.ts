@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Player } from './player.model';
 import { Room } from './room.model';
+import { RoomConfiguration } from './roomConfiguration.model';
 
 @Injectable()
 export class RoomsService {
@@ -33,14 +34,15 @@ export class RoomsService {
     this.rooms.delete(roomNumber);
   }
 
-  createNewRoom(creator: Player) {
+  createNewRoom(creator: Player, config: RoomConfiguration) {
     if (this.rooms.keys.length >= this.MAX_ROOM_COUNT)
       throw new HttpException('Maximum amount of rooms reached', HttpStatus.SERVICE_UNAVAILABLE);
 
     const room = {
       id: randomUUID(),
       roomNumber: this.generateNewRoomNumber(),
-      players: [creator]
+      players: [creator],
+      config: config
     };
 
     this.rooms.set(room.roomNumber, room);
