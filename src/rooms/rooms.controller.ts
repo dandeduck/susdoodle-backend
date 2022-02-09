@@ -17,6 +17,8 @@ export class RoomsController {
   @Post('join')
   @UseGuards(AuthGuard('api-key'))
   joinRoom(@Body('player') player: Player, @Body('id') id?: string, @Body('number') roomNumber?: number) {
+    if (!id && !roomNumber)
+      return this.roomsService.joinOpenRoom(player);
     return this.roomsService.addPlayer(player, id, roomNumber);
   }
 

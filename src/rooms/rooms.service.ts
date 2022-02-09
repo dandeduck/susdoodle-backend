@@ -10,8 +10,19 @@ export class RoomsService {
   private rooms = new Map<number, Room>();
   private roomIds = new Map<string, number>();
 
-  getOpenRooms() {
+  joinOpenRoom(player: Player) {
+    const room = this.getOpenRoom();
+
+    if (room)
+      return this.addPlayer(player, room.id);
     
+    return new HttpException("There are currently no open rooms", HttpStatus.NOT_FOUND);
+  }
+
+  private getOpenRoom() {
+    return [...this.rooms.values()]
+      .filter(room => room.config.isOpen && room.players.length < room.config.size)
+      .sort((a, b) => 0.5 - Math.random())[0];
   }
 
   removePlayer(player: Player, roomNumber?: number, id?: string) {
@@ -46,8 +57,8 @@ export class RoomsService {
 
       return room;
     }
-    else
-      throw new HttpException("Room by this number/id doesn't exist", HttpStatus.BAD_REQUEST);
+    
+    throw new HttpException("Room by this number/id doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
   closeRoom(roomNumber?: number, id?: string) {
