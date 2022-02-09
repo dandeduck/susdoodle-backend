@@ -41,6 +41,7 @@ lerna-debug.log*
 redis.conf
 ormconfig.json
 test.txt
+/cert
 
 #DB
 dump.rdb
