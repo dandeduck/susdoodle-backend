@@ -7,8 +7,15 @@ import { RoomConfiguration } from './roomConfiguration.model';
 @Injectable()
 export class RoomsService {
   private MAX_ROOM_COUNT = 1000;
-  private rooms = new Map<number, Room>();
-  private roomIds = new Map<string, number>();
+  private rooms = new Map<string, Room>();
+  private roomIds = new Map<number, string>();
+
+  getRoom(id: string) {
+    if (this.rooms.has(id))
+      return this.rooms.get(id);
+
+    throw new HttpException("Room by this id doesn't exist", HttpStatus.BAD_REQUEST);
+  }
 
   joinOpenRoom(player: Player) {
     const room = this.getOpenRoom();
@@ -22,15 +29,15 @@ export class RoomsService {
   private getOpenRoom() {
     return [...this.rooms.values()]
       .filter(room => room.config.isOpen && room.players.length < room.config.size)
-      .sort((a, b) => 0.5 - Math.random())[0];
+      .sort(() => 0.5 - Math.random())[0];
   }
 
   removePlayer(player: Player, roomNumber?: number, id?: string) {
-    if (id)
-      roomNumber = this.roomIds.get(id);
+    if (roomNumber)
+      id = this.roomIds.get(roomNumber);
 
-    if (roomNumber && this.rooms.has(roomNumber))
-      this.removePlayerFromRoom(this.rooms.get(roomNumber), player);
+    if (id && this.rooms.has(id))
+      this.removePlayerFromRoom(this.rooms.get(id), player);
     else
       throw new HttpException("Room by this number doesn't exist", HttpStatus.BAD_REQUEST);
   }
@@ -44,11 +51,11 @@ export class RoomsService {
   }
 
   addPlayer(player: Player, id?: string, roomNumber?: number) {
-    if (id)
-      roomNumber = this.roomIds.get(id);
+    if (roomNumber)
+      id = this.roomIds.get(roomNumber);
 
-    if (roomNumber && this.rooms.has(roomNumber)) {
-      const room = this.rooms.get(roomNumber);
+    if (id && this.rooms.has(id)) {
+      const room = this.rooms.get(id);
 
       if (room.config.size <= room.players.length)
         throw new HttpException("The room is full", HttpStatus.FORBIDDEN);
@@ -57,17 +64,17 @@ export class RoomsService {
 
       return room;
     }
-    
+
     throw new HttpException("Room by this number/id doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
   closeRoom(roomNumber?: number, id?: string) {
-    if (id)
-      roomNumber = this.roomIds.get(id);
+    if (roomNumber)
+      id = this.roomIds.get(roomNumber);
     
-    if (roomNumber) {
-      this.roomIds.delete(this.rooms.get(roomNumber).id);
-      this.rooms.delete(roomNumber);
+    if (id) {
+      this.roomIds.delete(this.rooms.get(id).roomNumber);
+      this.rooms.delete(id);
     }
 
     else
@@ -85,8 +92,8 @@ export class RoomsService {
       config: config
     };
 
-    this.rooms.set(room.roomNumber, room);
-    this.roomIds.set(room.id, room.roomNumber);
+    this.rooms.set(room.id, room);
+    this.roomIds.set(room.roomNumber, room.id);
 
     return room;
   }
@@ -96,7 +103,7 @@ export class RoomsService {
 
     do {
       roomNumber = Math.floor(100000 + Math.random() * 900000);
-    } while(this.rooms.has(roomNumber));
+    } while(this.roomIds.has(roomNumber));
 
     return roomNumber;
   }

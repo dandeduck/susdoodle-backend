@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { WordsService } from 'src/words/words.service';
 import { Player } from './player.model';
@@ -8,7 +8,13 @@ import { RoomsService } from './rooms.service';
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService, private readonly wordsService: WordsService){}
 
-  @Post('leave')
+  @Get(':id')
+  @UseGuards(AuthGuard('api-key'))
+  getRoom(@Param() param) {
+    return this.roomsService.getRoom(param.id);
+  }
+
+  @Delete('leave')
   @UseGuards(AuthGuard('api-key'))
   leaveRoom(@Body('player') player: Player, @Body('id') id?: string, @Body('number') roomNumber?: number) {
     this.roomsService.removePlayer(player, roomNumber, id);
