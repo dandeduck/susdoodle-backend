@@ -7,6 +7,7 @@ import { WordsService } from 'src/words/words.service';
 @Module({
   imports: [WordsModule],
   providers: [RoomsService],
-  controllers: [RoomsController]
+  controllers: [RoomsController],
+  exports: [RoomsService]
 })
 export class RoomsModule {}

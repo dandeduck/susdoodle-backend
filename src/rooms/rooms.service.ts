@@ -10,8 +10,15 @@ export class RoomsService {
   private rooms = new Map<string, Room>();
   private roomIds = new Map<number, string>();
 
-  getRoom(id: string) {
-    if (this.rooms.has(id))
+  getRoom(id: string | number): Room;
+  getRoom(id: string): Room;
+  getRoom(roomNumber: number): Room;
+
+  getRoom(id: any): Room {
+    if (typeof(id) === 'number')
+      id = this.roomIds.get(id);
+
+    if (id && this.rooms.has(id))
       return this.rooms.get(id);
 
     throw new HttpException("Room by this id doesn't exist", HttpStatus.BAD_REQUEST);
