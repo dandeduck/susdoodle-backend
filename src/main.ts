@@ -9,9 +9,7 @@ async function bootstrap() {
     key: fs.readFileSync('./cert/key.pem'),
     cert: fs.readFileSync('./cert/cert.pem'),
   };
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions
-  });
+  const app = await NestFactory.create(AppModule, {cors: true}); 
   app.setGlobalPrefix('v1');
   await app.listen(configService.getPort());
 }

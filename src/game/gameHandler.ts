@@ -12,7 +12,7 @@ export class GameHandler {
   }
 
   addPlayer(player: Player, client: Socket) {
-    if (this.room.players.includes(player))
+    if (this.room.players.filter(p => p.id === player.id).length > 0)
       this.playerSockets.set(player, client)
     else
       throw new HttpException("Player is not a member in given room", HttpStatus.FORBIDDEN);
