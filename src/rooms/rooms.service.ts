@@ -45,8 +45,13 @@ export class RoomsService {
     if (roomNumber)
       id = this.roomIds.get(roomNumber);
 
-    if (id && this.rooms.has(id))
-      this.removePlayerFromRoom(this.rooms.get(id), player);
+    if (id && this.rooms.has(id)) {
+      const room = this.rooms.get(id);
+      this.removePlayerFromRoom(room, player);
+
+      if (!room.players.length)
+        this.closeRoom(room.roomNumber);
+    }
     else
       throw new HttpException("Room by this number doesn't exist", HttpStatus.BAD_REQUEST);
   }
