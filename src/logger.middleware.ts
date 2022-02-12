@@ -6,7 +6,7 @@ export class LoggerMiddleware implements NestMiddleware {
   private start = Date.now();
 
   use(req: Request, res: Response, next: NextFunction) {
-    console.log((Date.now() - this.start) * 0.001, req.method, req.url);
+    console.log(Math.floor((Date.now() - this.start) * 0.001), req.method, req.url);
     next();
   }
 }

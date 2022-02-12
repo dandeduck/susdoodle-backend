@@ -90,14 +90,14 @@ export class RoomsService {
       throw new HttpException("Room by this number/id doesn't exist", HttpStatus.BAD_REQUEST);
   }
 
-  createNewRoom(creator: Player, config: RoomConfiguration) {
+  createNewRoom(config: RoomConfiguration) {
     if (this.rooms.keys.length >= this.MAX_ROOM_COUNT)
       throw new HttpException('Maximum amount of rooms reached', HttpStatus.SERVICE_UNAVAILABLE);
 
     const room = {
       id: randomUUID(),
       roomNumber: this.generateNewRoomNumber(),
-      players: [creator],
+      players: [],
       config: config
     };
 

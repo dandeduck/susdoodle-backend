@@ -14,7 +14,7 @@ export class RoomsController {
     return this.roomsService.getRoom(param.id);
   }
 
-  @Delete('leave')
+  @Post('leave')
   @UseGuards(AuthGuard('api-key'))
   leaveRoom(@Body('player') player: Player, @Body('id') id?: string, @Body('number') roomNumber?: number) {
     this.roomsService.removePlayer(player, roomNumber, id);
@@ -30,7 +30,7 @@ export class RoomsController {
 
   @Post('new')
   @UseGuards(AuthGuard('api-key'))
-  async createRoom(@Body('creator') creator: Player, @Body('config') config: {isOpen: boolean, size: number, doodleTime: number, length: number, categories: string[]}) {
+  async createRoom(@Body('config') config: {isOpen: boolean, size: number, doodleTime: number, length: number, categories: string[]}) {
     const wordAmount = config.length * 2;
     const words = await this.wordsService.getWordsFromAll(wordAmount, config.categories);
     const completedConfig = {
@@ -40,6 +40,6 @@ export class RoomsController {
       doodleTime: config.doodleTime
     }
 
-    return this.roomsService.createNewRoom(creator, completedConfig);
+    return this.roomsService.createNewRoom(completedConfig);
   }
 }
