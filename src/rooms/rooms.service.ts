@@ -21,6 +21,8 @@ export class RoomsService {
     if (id && this.rooms.has(id))
       return this.rooms.get(id);
 
+    console.log([this.rooms.keys][0], id)
+
     throw new HttpException("Room by this id doesn't exist", HttpStatus.BAD_REQUEST);
   }
 

@@ -7,10 +7,11 @@ import { AnimalWord } from './models/animalWord.entity';
 import { FamousPeopleWord } from './models/famousPeopleWord.entity';
 import { FoodWord } from './models/foodWord.entity';
 import { MovieWord } from './models/movieWord.entity';
+import { ThingWord } from './models/thingWord.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ActivityWord, AnimalWord, FamousPeopleWord, FoodWord, MovieWord])
+    TypeOrmModule.forFeature([ActivityWord, AnimalWord, FamousPeopleWord, FoodWord, MovieWord, ThingWord])
   ],
   providers: [WordsService],
   controllers: [WordsController],

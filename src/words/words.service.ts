@@ -6,6 +6,7 @@ import { AnimalWord } from './models/animalWord.entity';
 import { FamousPeopleWord } from './models/famousPeopleWord.entity';
 import { FoodWord } from './models/foodWord.entity';
 import { MovieWord } from './models/movieWord.entity';
+import { ThingWord } from './models/thingWord.entity';
 import { Word } from './models/word.entity';
 
 @Injectable()
@@ -25,19 +26,23 @@ export class WordsService {
     @InjectRepository(FoodWord)
     foodWordRepository: Repository<FoodWord>,
     @InjectRepository(MovieWord)
-    movieWordRepository: Repository<MovieWord>
+    movieWordRepository: Repository<MovieWord>,
+    @InjectRepository(ThingWord)
+    thingWordRepository: Repository<ThingWord>
   ) {
     this.categoryRepositories.set('activity', activityWordRepository);
     this.categoryRepositories.set('animal', animalWordRepository);
     this.categoryRepositories.set('person', famousPeopleWordRepository);
     this.categoryRepositories.set('food', foodWordRepository);
     this.categoryRepositories.set('movie', movieWordRepository);
+    this.categoryRepositories.set('thing', thingWordRepository);
 
     this.categoryEntities.set('activity', ActivityWord);
     this.categoryEntities.set('animal', AnimalWord);
     this.categoryEntities.set('person', FamousPeopleWord);
     this.categoryEntities.set('food', FoodWord);
     this.categoryEntities.set('movie', MovieWord);
+    this.categoryEntities.set('thing', ThingWord);
   }
 
   addWord(word: string, category: string) {
